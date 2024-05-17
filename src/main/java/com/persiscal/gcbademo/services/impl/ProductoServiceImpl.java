@@ -39,7 +39,10 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public ResponseEntity<?> create(ProductoDTO productoDTO) {
-        return armarProducto(productoDTO);
+        if(productoDTO.getNombre() == null || productoDTO.getCantidad() == null || productoDTO.getPrecio() == null) {
+            return new ResponseEntity<>("Faltan completar datos del producto", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(armarProducto(productoDTO), HttpStatus.CREATED);
     }
 
     @Override
@@ -83,12 +86,7 @@ public class ProductoServiceImpl implements ProductoService {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private ResponseEntity<?> armarProducto(ProductoDTO productoDTO) {
-        if(productoDTO.getNombre() == null || productoDTO.getCantidad() == null || productoDTO.getDescripcion() == null
-        || productoDTO.getPrecio() == null) {
-            return new ResponseEntity<>("Faltan completar datos del producto", HttpStatus.BAD_REQUEST);
-        }
-
+    private Producto armarProducto(ProductoDTO productoDTO) {
         Producto producto = Producto.builder()
                 .nombre(productoDTO.getNombre())
                 .cantidad(productoDTO.getCantidad())
@@ -96,8 +94,6 @@ public class ProductoServiceImpl implements ProductoService {
                 .precio(productoDTO.getPrecio())
                 .build();
 
-        productoRepository.save(producto);
-
-        return new ResponseEntity<>(producto, HttpStatus.CREATED);
+        return productoRepository.save(producto);
     }
 }
