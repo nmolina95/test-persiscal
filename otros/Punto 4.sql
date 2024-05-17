@@ -1,0 +1,77 @@
+CREATE TABLE PRODUCTOS (
+    id_producto INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    descripcion VARCHAR(255),
+    precio DECIMAL(10, 2) NOT NULL,
+    cantidad INT NOT NULL
+);
+
+CREATE TABLE CLIENTE (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    direccion VARCHAR(255) NOT NULL
+)
+
+CREATE TABLE VENTA (
+    id_venta INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATETIME NOT NULL,
+    id_cliente INT NOT NULL,
+    monto_total DECIMAL(10,2) NOT NULL,
+    estado VARCHAR(255) NOT NULL,
+    CONSTRAINT fk_cliente FOREIGN KEY (id_cliente) REFERENCES CLIENTE(id_cliente)
+);
+
+CREATE TABLE DETALLE_VENTA (
+    id_detalle INT PRIMARY KEY,
+    id_venta INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10,2),
+    CONSTRAINT fk_venta FOREIGN KEY (id_venta) REFERENCES VENTA(id_venta),
+    CONSTRAINT fk_producto FOREIGN KEY (id_producto) REFERENCES PRODUCTO(id_producto)
+)
+
+INSERT INTO PRODUCTOS VALUES (1, 'Computador', 'Macbook', 20.0, 12);
+INSERT INTO PRODUCTOS VALUES (2, 'Microondas', NULL, 20.0, 12);
+INSERT INTO PRODUCTOS VALUES (3, 'Televisor', 'Samsung', 20.0, 12);
+INSERT INTO PRODUCTOS VALUES (4, 'Horno', '', 20.0, 12);
+
+INSERT INTO CLIENTE VALUES (1, 'Nacho', 'nacho@gmail.com', 'Calle Falsa 123');
+INSERT INTO CLIENTE VALUES (2, 'Martin', 'martin@gmail.com', 'Calle Falsa 456');
+INSERT INTO CLIENTE VALUES (3, 'Nicolas', 'nicolas@gmail.com', 'Calle Falsa 789');
+INSERT INTO CLIENTE VALUES (4, 'Manuel', 'manuel@gmail.com', 'Calle Falsa 012');
+
+INSERT INTO VENTA VALUES (1, '2024-05-16 11:55:09', 1, '20', 'CONCRETADA');
+INSERT INTO VENTA VALUES (2, NOW(), 2, 40, 'CONCRETADA');
+INSERT INTO VENTA VALUES (3, '2024-05-10 12:05:10', 3, 69, 'PENDIENTE');
+INSERT INTO VENTA VALUES (4, DATE_SUB(NOW(), INTERVAL 3 DAY), 4, 20, 'CONCRETADA');
+INSERT INTO VENTAS VALUES (5, NOW(), 1, 60, 'CONCRETADA');
+INSERT INTO VENTAS VALUES (6, DATE_SUB(NOW(), INTERVAL 5 HOUR), 1, 80, 'CONCRETADA');
+
+INSERT INTO DETALLE_VENTA VALUES (1, 1, 1, 1, 20);
+INSERT INTO DETALLE_VENTA VALUES (2, 2, 2, 2, 20);
+INSERT INTO DETALLE_VENTA VALUES (3, 3, 3, 3, 20);
+INSERT INTO DETALLE_VENTA VALUES (4, 4, 4, 1, 20);
+INSERT INTO DETALLE_VENTAS VALUES (5, 5, 3, 3, 20);
+INSERT INTO DETALLE_VENTAS VALUES (6, 6, 4, 4, 20);
+
+/* Punto 4 a) */
+
+SELECT * FROM PRODUCTOS WHERE nombre IS NOT NULL AND (DESCRIPCION IS NULL OR descripcion = '');
+
+/* Punto 4 b) */
+
+SELECT * FROM VENTA WHERE fecha >= DATE_SUB(NOW(), INTERVAL 24 HOUR);
+
+/* Punto 4 c) */
+
+SELECT estado, COUNT(*) AS total_estados FROM VENTA GROUP BY estado;
+
+/* Punto 4 d) */
+
+SELECT VENTAS. *
+FROM VENTAS ventas
+INNER JOIN CLIENTES clientes ON ventas.id_cliente = clientes.id_cliente
+WHERE clientes.email = 'nacho@gmail.com'
+AND ventas.monto_total > 10
